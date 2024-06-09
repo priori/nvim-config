@@ -174,7 +174,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>f', vim.diagnostic.setloclist, { desc = 'Open diagnostic Quick[f]ix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -226,9 +226,13 @@ end, { desc = '[Q]uit' })
 vim.keymap.set('n', '<leader>bd', function()
   vim.cmd 'bd'
 end, { desc = 'Close buffer' })
-vim.keymap.set('n', 'ww', function()
+vim.keymap.set('n', '<leader>ww', function()
   vim.cmd 'w'
-end, { desc = 'Close buffer' })
+end, { desc = 'Save ([W]rite)' })
+vim.keymap.set('n', '<leader>wd', function()
+  vim.cmd 'w'
+  vim.cmd 'bd'
+end, { desc = 'Save & Close ([W]rite and Buffer [D]elete)' })
 vim.keymap.set('n', '<leader>w', function()
   vim.cmd 'w'
 end, { desc = 'Close buffer' })
@@ -449,32 +453,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-      local isdir = function(path)
-        local ok = vim.loop.fs_stat(path)
-        return ok
-      end
-      local launch = function()
-        local path = vim.loop.cwd() .. '/.git'
-        if isdir(path) then
-          require('telescope.builtin').git_files {
-            layout_config = {
-              -- width = 0.9,
-              -- preview_width = 0.6,
-            },
-          }
-        else
-          require('telescope.builtin').find_files {
-            layout_config = {
-              -- width = 0.9,
-              -- preview_width = 0.6,
-            },
-          }
-        end
-      end
+      vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = '[S]earch [F]iles' })
       -- local launch = builtin.find_files
-      vim.keymap.set('n', '<space><space>', launch)
-      vim.keymap.set('n', '<c-p>', launch)
+      vim.keymap.set('n', '<c-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<Tab>', function()
         require('telescope.builtin').buffers { sort_lastused = 1 }
       end, { desc = 'Buffers' })
@@ -618,6 +599,15 @@ require('lazy').setup({
           nmap('<S-Enter>', vim.lsp.buf.definition)
           nmap('<C-Enter>', vim.lsp.buf.definition)
           nmap('<A-Enter>', vim.lsp.buf.definition)
+
+          nmap('<leader>d<enter>', function()
+            local current_buffer = vim.fn.bufnr '%'
+            local modified = vim.bo.modified
+            vim.lsp.buf.definition()
+            if not modified then
+              vim.cmd('bd ' .. current_buffer)
+            end
+          end)
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -1050,6 +1040,7 @@ require('lazy').setup({
       }
       vim.keymap.set('n', '<Esc>', function()
         vim.cmd 'Noice dismiss'
+        vim.cmd 'nohlsearch'
       end)
     end,
     dependencies = {
