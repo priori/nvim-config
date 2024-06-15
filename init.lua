@@ -182,7 +182,7 @@ vim.keymap.set('n', '<leader>f', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -194,48 +194,59 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
--- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
--- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
--- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
--- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-vim.keymap.set('i', '<C-h>', '<left>')
-vim.keymap.set('i', '<C-l>', '<right>')
-vim.keymap.set('i', '<C-j>', '<down>')
-vim.keymap.set('i', '<C-k>', '<up>')
--- vim.keymap.set({ 'v', 'n' }, '<Tab>', function()
---   vim.cmd 'bn'
--- end)
--- vim.keymap.set({ 'v', 'n' }, '<S-Tab>', function()
---   vim.cmd 'bp'
--- end)
-vim.keymap.set('n', '<C-j>', function()
+-- moving cursor
+vim.keymap.set({ 'i', 't' }, '<C-h>', '<Left>')
+vim.keymap.set({ 'i', 't' }, '<C-l>', '<Right>')
+vim.keymap.set({ 'i', 't' }, '<C-j>', '<down>')
+vim.keymap.set({ 'i', 't' }, '<C-k>', '<up>')
+
+-- moving lines
+vim.keymap.set('n', '<C-S-j>', function()
   vim.cmd 'm+1'
 end)
-vim.keymap.set('n', '<C-k>', function()
+vim.keymap.set('n', '<C-S-k>', function()
   vim.cmd 'm-2'
 end)
-vim.api.nvim_set_keymap('v', '<C-j>', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
-vim.api.nvim_set_keymap('v', '<C-k>', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-S-j>', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-S-k>', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
+
+-- dealing with buffers
 vim.keymap.set('n', '<leader>q', function()
-  vim.cmd 'q'
-end, { desc = '[Q]uit' })
-vim.keymap.set('n', 'qq', function()
+  if vim.bo.modified then
+    vim.notify('Buffer is modified, use :w to save or :bd! to force close!', 'warn', {
+      title = 'Buffer is modified',
+    })
+    return
+  end
   vim.cmd 'q'
 end, { desc = '[Q]uit' })
 vim.keymap.set('n', '<leader>bd', function()
+  if vim.bo.modified then
+    vim.notify('Buffer is modified, use :w to save or :bd! to force close!', 'warn', {
+      title = 'Buffer is modified',
+    })
+    return
+  end
   vim.cmd 'bd'
-end, { desc = 'Close buffer' })
+end, { desc = '[D]elete [B]uffer' })
 vim.keymap.set('n', '<leader>ww', function()
   vim.cmd 'w'
 end, { desc = 'Save ([W]rite)' })
+
 vim.keymap.set('n', '<leader>wd', function()
   vim.cmd 'w'
   vim.cmd 'bd'
-end, { desc = 'Save & Close ([W]rite and Buffer [D]elete)' })
-vim.keymap.set('n', '<leader>w', function()
+end, { desc = 'Save ([W]rite) & [D]elete Buffer' })
+
+vim.keymap.set('n', '<leader>wq', function()
   vim.cmd 'w'
-end, { desc = 'Close buffer' })
+  vim.cmd 'q'
+end, { desc = 'Save ([W]rite) & [Q]uit' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -454,8 +465,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = '[S]earch [F]iles' })
-      -- local launch = builtin.find_files
-      vim.keymap.set('n', '<c-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<Tab>', function()
         require('telescope.builtin').buffers { sort_lastused = 1 }
       end, { desc = 'Buffers' })
@@ -582,32 +591,69 @@ require('lazy').setup({
             if desc then
               desc = 'LSP: ' .. desc
             end
-            vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+            vim.keymap.set('n', keys, func, { buffer = event.buf, desc = desc })
           end
-          -- nmap('<backspace>', function()
-          --   require('telescope.builtin').lsp_references {
-          --     layout_strategy = 'vertical',
-          --     show_line = false,
-          --   }
-          -- end, 'Back to Refs')
-          nmap('<Enter>', function()
-            require('telescope.builtin').lsp_references {
-              layout_strategy = 'vertical',
+
+          -- enter: definition
+          -- leader enter: refereces
+          -- shift enter: delete buf and defs
+          -- shift space enter: delete buf and refs
+          nmap('<enter>', function()
+            require('telescope.builtin').lsp_definitions {
               show_line = false,
             }
-          end, 'Back to Refs')
-          nmap('<S-Enter>', vim.lsp.buf.definition)
-          nmap('<C-Enter>', vim.lsp.buf.definition)
-          nmap('<A-Enter>', vim.lsp.buf.definition)
-
-          nmap('<leader>d<enter>', function()
-            local current_buffer = vim.fn.bufnr '%'
-            local modified = vim.bo.modified
-            vim.lsp.buf.definition()
-            if not modified then
-              vim.cmd('bd ' .. current_buffer)
+          end, 'Close Curr. Buff. and Goto Definition')
+          nmap('<leader><enter>', function()
+            require('telescope.builtin').lsp_references {
+              show_line = false,
+            }
+          end, 'Close Curr. Buff. and Goto References')
+          local prev = nil
+          local deleteAndGoToRefs = function()
+            if not vim.bo.modified then
+              prev = vim.api.nvim_get_current_buf()
             end
-          end)
+            require('telescope.builtin').lsp_references {
+              show_line = false,
+            }
+          end
+          local deleteAndGoToDef = function()
+            if not vim.bo.modified then
+              prev = vim.api.nvim_get_current_buf()
+            end
+            require('telescope.builtin').lsp_definitions {
+              show_line = false,
+            }
+          end
+          nmap('<s-enter>', deleteAndGoToDef, 'Close Curr. B. and Goto Definition')
+          nmap('<leader><s-enter>', deleteAndGoToRefs, 'Close Curr. B. and Goto References')
+          vim.api.nvim_create_autocmd('BufEnter', {
+            pattern = '*',
+            callback = function()
+              local windows = vim.api.nvim_list_wins()
+              for _, win in ipairs(windows) do
+                local buf = vim.api.nvim_win_get_buf(win)
+                if buf == prev then
+                  return
+                end
+              end
+              if
+                prev ~= nil
+                and vim.api.nvim_buf_is_loaded(prev)
+                and vim.api.nvim_buf_get_name(prev) ~= ''
+                and vim.api.nvim_buf_get_option(prev, 'buflisted')
+                and vim.api.nvim_buf_get_option(prev, 'filetype') ~= ''
+                and not vim.api.nvim_buf_get_option(prev, 'modified')
+              then
+                local prevRelativeName = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(prev), ':~:.')
+                vim.notify(prevRelativeName, 'message', {
+                  title = 'Closed ✓',
+                })
+                vim.cmd('bd ' .. prev)
+              end
+              prev = nil
+            end,
+          })
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -872,11 +918,15 @@ require('lazy').setup({
           ['<C-l>'] = cmp.mapping(function()
             if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
+            else
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<right>', true, false, true), 'n', true)
             end
           end, { 'i', 's' }),
           ['<C-h>'] = cmp.mapping(function()
             if luasnip.locally_jumpable(-1) then
               luasnip.jump(-1)
+            else
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<left>', true, false, true), 'n', true)
             end
           end, { 'i', 's' }),
 
@@ -1100,3 +1150,52 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+local function is_empty_unmodified(buf)
+  return vim.api.nvim_buf_is_loaded(buf)
+    and vim.api.nvim_buf_get_name(buf) == ''
+    and vim.api.nvim_buf_get_option(buf, 'buflisted')
+    and vim.api.nvim_buf_get_option(buf, 'buftype') == ''
+    and vim.api.nvim_buf_get_option(buf, 'filetype') == ''
+    and not vim.api.nvim_buf_get_option(buf, 'modified')
+    and vim.api.nvim_buf_line_count(buf) == 1
+end
+vim.api.nvim_create_autocmd('BufEnter', {
+  pattern = '*',
+  callback = function()
+    local buffers = vim.api.nvim_list_bufs()
+    local current = vim.api.nvim_get_current_buf()
+    for _, buffer in ipairs(buffers) do
+      if is_empty_unmodified(buffer) and buffer ~= current then
+        vim.api.nvim_buf_delete(buffer, {})
+      end
+    end
+  end,
+})
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    if vim.fn.argv(0) == '' then
+      require('telescope.builtin').find_files()
+    end
+  end,
+})
+
+-- record macro indicators
+local register = nil
+vim.api.nvim_create_autocmd('RecordingEnter', {
+  pattern = '*',
+  callback = function()
+    register = vim.fn.reg_recording()
+    print('Recording macro at ' .. register)
+  end,
+})
+vim.api.nvim_create_autocmd('RecordingLeave', {
+  pattern = '*',
+  callback = function()
+    if register then
+      print('Macro recorded at ' .. register)
+    else
+      print 'Macro recorded.'
+    end
+  end,
+})
