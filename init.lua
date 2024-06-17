@@ -182,7 +182,7 @@ vim.keymap.set('n', '<leader>f', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -405,6 +405,51 @@ require('lazy').setup({
       -- Telescope picker. This is really useful to discover what Telescope can
       -- do as well as how to actually do it!
 
+      local prev = nil
+      local prev2 = nil
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'TelescopeFindPre',
+        callback = function()
+          if not vim.bo.modified then
+            prev2 = vim.api.nvim_get_current_buf()
+          end
+        end,
+      })
+      -- vim.api.nvim_create_autocmd('CmdPre', {
+      --   pattern = 'Telescope*',
+      --   callback = function()
+      --     -- _G.previous_buffer = vim.fn.bufnr('%')
+      --     print 'telescope'
+      --   end,
+      -- })
+      vim.api.nvim_create_autocmd('BufEnter', {
+        pattern = '*',
+        callback = function()
+          local windows = vim.api.nvim_list_wins()
+          for _, win in ipairs(windows) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if buf == prev then
+              return
+            end
+          end
+          if
+            prev ~= nil
+            and vim.api.nvim_buf_is_loaded(prev)
+            and vim.api.nvim_buf_get_name(prev) ~= ''
+            and vim.api.nvim_buf_get_option(prev, 'buflisted')
+            and vim.api.nvim_buf_get_option(prev, 'filetype') ~= ''
+            and not vim.api.nvim_buf_get_option(prev, 'modified')
+          then
+            local prevRelativeName = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(prev), ':~:.')
+            vim.notify(prevRelativeName, 'message', {
+              title = 'Closed ✓',
+            })
+            vim.cmd('bd ' .. prev)
+          end
+          prev = nil
+        end,
+      })
+
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
@@ -431,6 +476,10 @@ require('lazy').setup({
               ['<C-x>'] = require('telescope.actions').delete_buffer,
               ['<C-c>'] = require('telescope.actions').delete_buffer,
               ['<C-d>'] = require('telescope.actions').delete_buffer,
+              ['<s-enter>'] = function(buf)
+                prev = prev2
+                require('telescope.actions').select_default(buf)
+              end,
             },
           },
         },
@@ -1172,9 +1221,12 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
   end,
 })
+
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
-    if vim.fn.argv(0) == '' then
+    local cwd = vim.loop.cwd()
+    local git = vim.loop.fs_stat(cwd .. '/.git')
+    if vim.fn.argv(0) == '' and git then
       require('telescope.builtin').find_files()
     end
   end,
@@ -1189,6 +1241,7 @@ vim.api.nvim_create_autocmd('RecordingEnter', {
     print('Recording macro at ' .. register)
   end,
 })
+
 vim.api.nvim_create_autocmd('RecordingLeave', {
   pattern = '*',
   callback = function()
