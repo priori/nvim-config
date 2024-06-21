@@ -219,6 +219,7 @@ vim.api.nvim_set_keymap('v', '<C-S-k>', ":m '<-2<CR>gv=gv", { noremap = true, si
 vim.keymap.set('n', '<leader>q', function()
   local buffers = vim.api.nvim_list_bufs()
   local unsaved_buffers = ''
+  local terminal_buffers = ''
   for _, buf in ipairs(buffers) do
     if vim.fn.getbufvar(buf, '&modified') == 1 then
       if vim.fn.bufname(buf) == '' then
@@ -227,10 +228,19 @@ vim.keymap.set('n', '<leader>q', function()
         unsaved_buffers = unsaved_buffers .. '\n- ' .. vim.fn.bufname(buf)
       end
     end
+    if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then
+      terminal_buffers = terminal_buffers .. '\n- ' .. vim.fn.bufname(buf)
+    end
   end
   if unsaved_buffers ~= '' then
     vim.notify('Buffer is modified, use :w to save or :bd! to force close!' .. unsaved_buffers, 'warn', {
       title = 'Buffer is modified',
+    })
+    return
+  end
+  if terminal_buffers ~= '' then
+    vim.notify('Buffer terminal, use exit to close!' .. terminal_buffers, 'warn', {
+      title = 'Cannot close terminal buffer',
     })
     return
   end
