@@ -1104,8 +1104,8 @@ require('lazy').setup({
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
 
-        ['<c-k>'] = { 'select_prev', 'fallback' },
-        ['<c-j>'] = { 'select_next', 'fallback' },
+        ['<c-k>'] = { 'select_prev', 'fallback_to_mappings' },
+        ['<c-j>'] = { 'select_next', 'fallback_to_mappings' },
         ['<cr>'] = { 'accept', 'fallback' },
       },
 
@@ -1142,6 +1142,12 @@ require('lazy').setup({
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
     },
+    config = function(_, opts)
+      local keymap = vim.api.nvim_set_keymap
+      keymap('c', '<c-j>', '<Left>', { noremap = true })
+      keymap('c', '<c-k>', '<Right>', { noremap = true })
+      require('blink.cmp').setup(opts)
+    end,
   },
 
   { -- You can easily change to a different colorscheme.
