@@ -3,39 +3,60 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  'smoka7/hop.nvim',
-  version = '*',
-  opts = {
-    keys = 'etovxqpdygfblzhckisuran',
+  {
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    ---@type Flash.Config
+    opts = {
+      modes = {
+        search = {
+          enabled = true,
+        },
+      },
+    },
+    keys = {
+      {
+        's',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').jump()
+        end,
+        desc = 'Flash',
+      },
+      {
+        'S',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').treesitter()
+        end,
+        desc = 'Flash Treesitter',
+      },
+      {
+        'r',
+        mode = 'o',
+        function()
+          require('flash').remote()
+        end,
+        desc = 'Remote Flash',
+      },
+      {
+        'R',
+        mode = { 'o', 'x' },
+        function()
+          require('flash').treesitter_search()
+        end,
+        desc = 'Treesitter Search',
+      },
+      {
+        '<c-s>',
+        mode = { 'c' },
+        function()
+          require('flash').toggle()
+        end,
+        desc = 'Toggle Flash Search',
+      },
+    },
   },
-  config = function()
-    local hop = require 'hop'
-    local hint = require 'hop.hint'
-    vim.keymap.set('', '<leader>1', function()
-      hop.hint_char1 { current_line_only = false }
-    end, { remap = true })
-    vim.keymap.set('', '<leader>2', function()
-      hop.hint_char2 { current_line_only = false }
-    end, { remap = true })
-    vim.keymap.set('', '<leader>f', function()
-      hop.hint_words { current_line_only = false }
-    end, { remap = true })
-
-    vim.keymap.set('', 'f', function()
-      hop.hint_char1 { direction = hint.HintDirection.AFTER_CURSOR, current_line_only = true }
-    end, { remap = true })
-    vim.keymap.set('', 'F', function()
-      hop.hint_char1 { direction = hint.HintDirection.BEFORE_CURSOR, current_line_only = true }
-    end, { remap = true })
-    vim.keymap.set('', 't', function()
-      hop.hint_char1 { direction = hint.HintDirection.AFTER_CURSOR, current_line_only = true, hint_offset = -1 }
-    end, { remap = true })
-    vim.keymap.set('', 'T', function()
-      hop.hint_char1 { direction = hint.HintDirection.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 }
-    end, { remap = true })
-
-    hop.setup()
-  end,
   {
     'windwp/nvim-ts-autotag',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
