@@ -1372,6 +1372,7 @@ local function is_empty_unmodified(buf)
     and not vim.api.nvim_buf_get_option(buf, 'modified')
     and vim.api.nvim_buf_line_count(buf) == 1
 end
+
 vim.api.nvim_create_autocmd('BufEnter', {
   pattern = '*',
   callback = function()
@@ -1385,15 +1386,44 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
-vim.api.nvim_create_autocmd('VimEnter', {
+vim.api.nvim_create_autocmd('VimLeave', {
   callback = function()
-    local cwd = vim.loop.cwd()
-    local git = vim.loop.fs_stat(cwd .. '/.git')
-    if vim.fn.argv(0) == '' and git then
-      require('telescope.builtin').find_files()
+    if vim.fn.filewritable(vim.fn.getcwd() .. '/.session.vim') == 1 then
+      vim.cmd('mksession! ' .. vim.fn.getcwd() .. '/.session.vim')
     end
   end,
 })
+
+show_initial_telescope = function()
+  vim.api.nvim_create_autocmd('VimEnter', {
+    callback = function()
+      local cwd = vim.loop.cwd()
+      local git = vim.loop.fs_stat(cwd .. '/.git')
+      if vim.fn.argv(0) == '' and git then
+        require('telescope.builtin').find_files()
+      end
+    end,
+  })
+end
+
+if vim.fn.argv(0) == '' then
+  if vim.fn.filereadable(vim.fn.getcwd() .. '/.session.vim') == 1 then
+    vim.cmd 'source .session.vim'
+    local buffs = vim.api.nvim_list_bufs()
+    local normal_buffs_count = 0
+    for _, buf in ipairs(buffs) do
+      if vim.api.nvim_buf_get_name(buf) ~= '' then
+        normal_buffs_count = normal_buffs_count + 1
+      end
+    end
+    if normal_buffs_count == 0 then
+      show_initial_telescope()
+    end
+  else
+    buffs = vim.api.nvim_list_bufs()
+    show_initial_telescope()
+  end
+end
 
 -- record macro indicators
 local register = nil
