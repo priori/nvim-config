@@ -114,9 +114,16 @@ vim.opt.showmode = false
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
-end)
+-- vim.schedule(function()
+--   vim.opt.clipboard = 'unnamedplus'
+-- end)
+vim.api.nvim_create_autocmd('TextYankPost', {
+  callback = function()
+    if vim.v.event.operator == 'y' then
+      vim.fn.setreg('+', vim.fn.getreg '"')
+    end
+  end,
+})
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -273,6 +280,7 @@ vim.keymap.set('n', '<leader>bd', function()
   end
   vim.cmd 'bd'
 end, { desc = '[D]elete [B]uffer' })
+
 vim.keymap.set('n', '<leader>ww', function()
   vim.cmd 'w'
 end, { desc = 'Save ([W]rite)' })
