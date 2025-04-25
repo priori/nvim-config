@@ -29,7 +29,7 @@ vim.api.nvim_create_autocmd('VimLeave', {
   end,
 })
 
-local function endshow_initial_telescope()
+local function show_initial_telescope()
   vim.api.nvim_create_autocmd('VimEnter', {
     callback = function()
       local cwd = vim.loop.cwd()
