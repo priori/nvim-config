@@ -29,34 +29,48 @@ vim.api.nvim_create_autocmd('VimLeave', {
   end,
 })
 
-local function show_initial_telescope()
-  vim.api.nvim_create_autocmd('VimEnter', {
-    callback = function()
-      local cwd = vim.loop.cwd()
-      local git = vim.loop.fs_stat(cwd .. '/.git')
-      if vim.fn.argv(0) == '' and git then
-        require('telescope.builtin').find_files()
-      end
-    end,
-  })
+local function no_buffs()
+  local buffers = vim.api.nvim_list_bufs()
+  local normal_buffs_count = 0
+  for _, buf in ipairs(buffers) do
+    if vim.api.nvim_buf_get_name(buf) ~= '' then
+      normal_buffs_count = normal_buffs_count + 1
+    end
+  end
+  return normal_buffs_count == 0
+end
+
+local function no_float_windows()
+  local windows = vim.api.nvim_list_wins()
+  for _, win in ipairs(windows) do
+    if vim.api.nvim_win_get_config(win).relative ~= '' then
+      return false
+    end
+  end
+  return true
+end
+
+local function session_found()
+  return vim.fn.filereadable(vim.fn.getcwd() .. '/.session.vim') == 1
+end
+
+local function grant_session()
+  if session_found() and vim.fn.argv(0) == '' and no_buffs() and no_float_windows() then
+    vim.cmd 'source .session.vim'
+  end
 end
 
 if vim.fn.argv(0) == '' then
-  if vim.fn.filereadable(vim.fn.getcwd() .. '/.session.vim') == 1 then
-    vim.cmd 'source .session.vim'
-    local buffs = vim.api.nvim_list_bufs()
-    local normal_buffs_count = 0
-    for _, buf in ipairs(buffs) do
-      if vim.api.nvim_buf_get_name(buf) ~= '' then
-        normal_buffs_count = normal_buffs_count + 1
-      end
-    end
-    if normal_buffs_count == 0 then
-      show_initial_telescope()
-    end
-  else
-    buffs = vim.api.nvim_list_bufs()
-    show_initial_telescope()
+  grant_session()
+  if no_buffs() then
+    vim.api.nvim_create_autocmd('VimEnter', {
+      pattern = '*',
+      callback = function()
+        vim.defer_fn(function()
+          require('telescope.builtin').find_files()
+        end, 0)
+      end,
+    })
   end
 end
 
