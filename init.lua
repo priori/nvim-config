@@ -497,6 +497,13 @@ require('lazy').setup({
             },
           },
         },
+        pickers = {
+          lsp_definitions = {
+            file_ignore_patterns = {
+              'release',
+            },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
