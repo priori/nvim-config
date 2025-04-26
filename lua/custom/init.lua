@@ -21,14 +21,6 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
-vim.api.nvim_create_autocmd('VimLeave', {
-  callback = function()
-    if vim.fn.filewritable(vim.fn.getcwd() .. '/.session.vim') == 1 then
-      vim.cmd('mksession! ' .. vim.fn.getcwd() .. '/.session.vim')
-    end
-  end,
-})
-
 local function no_buffs()
   local buffers = vim.api.nvim_list_bufs()
   local normal_buffs_count = 0
@@ -50,25 +42,14 @@ local function no_float_windows()
   return true
 end
 
-local function session_found()
-  return vim.fn.filereadable(vim.fn.getcwd() .. '/.session.vim') == 1
-end
-
-local function grant_session()
-  if session_found() and vim.fn.argv(0) == '' and no_buffs() and no_float_windows() then
-    vim.cmd 'source .session.vim'
-  end
-end
-
 if vim.fn.argv(0) == '' then
-  grant_session()
   if no_buffs() then
     vim.api.nvim_create_autocmd('VimEnter', {
       pattern = '*',
       callback = function()
-        vim.defer_fn(function()
+        if no_buffs() then
           require('telescope.builtin').find_files()
-        end, 0)
+        end
       end,
     })
   end
