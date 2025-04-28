@@ -487,13 +487,7 @@ require('lazy').setup({
               ['<Esc>'] = require('telescope.actions').close,
               ['<C-j>'] = require('telescope.actions').move_selection_next,
               ['<C-k>'] = require('telescope.actions').move_selection_previous,
-              ['<C-x>'] = require('telescope.actions').delete_buffer,
               ['<C-c>'] = require('telescope.actions').delete_buffer,
-              ['<C-d>'] = require('telescope.actions').delete_buffer,
-              ['<s-enter>'] = function(buf)
-                prev = prev2
-                require('telescope.actions').select_default(buf)
-              end,
             },
           },
         },
