@@ -1,8 +1,14 @@
 -- moving cursor
-vim.keymap.set({ 'i', 't' }, '<C-h>', '<Left>')
-vim.keymap.set({ 'i', 't' }, '<C-l>', '<Right>')
-vim.keymap.set({ 'i', 't' }, '<C-j>', '<down>')
-vim.keymap.set({ 'i', 't' }, '<C-k>', '<up>')
+vim.keymap.set({ 'i', 't', 'c' }, '<C-h>', '<Left>')
+vim.keymap.set({ 'i', 't', 'c' }, '<C-l>', '<Right>')
+vim.keymap.set({ 'i', 't', 'c' }, '<C-j>', '<down>')
+vim.keymap.set({ 'i', 't', 'c' }, '<C-k>', '<up>')
+vim.keymap.set({ 'i', 't', 'c' }, '<C-S-h>', '<S-Left>')
+vim.keymap.set({ 'i', 't', 'c' }, '<C-S-l>', '<S-Right>')
+
+-- deleting
+vim.keymap.set({ 'i', 'c', 't' }, '<C-g>', '<BackSpace>')
+vim.keymap.set({ 'i', 'c', 't' }, '<C-;>', '<Delete>')
 
 -- moving lines
 vim.keymap.set('n', '<C-S-j>', function()
@@ -13,11 +19,19 @@ vim.keymap.set('n', '<C-S-k>', function()
 end)
 vim.api.nvim_set_keymap('v', '<C-S-j>', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-S-k>', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', 'J', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', 'K', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 
 -- disabling <Esc> in insert mode
 vim.keymap.set('i', '<Esc>', '<Nop>')
 vim.keymap.set('i', 'jj', '<Esc>')
 vim.keymap.set('i', '<c-c>', '<Esc>')
+
+-- scrolling
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-b>', '<C-b>zz')
+vim.keymap.set('n', '<C-f>', '<C-f>zz')
 
 -- dealing with buffers
 vim.keymap.set('n', '<leader>q', function()
@@ -66,6 +80,10 @@ vim.keymap.set('n', '<leader>bd', function()
   end
   vim.cmd 'bd'
 end, { desc = '[D]elete [B]uffer' })
+
+vim.keymap.set({ 'n', 'i' }, '<c-s>', function()
+  vim.cmd 'w'
+end)
 
 vim.keymap.set('n', '<leader>ww', function()
   vim.cmd 'w'
