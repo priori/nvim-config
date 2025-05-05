@@ -182,7 +182,8 @@ vim.opt.confirm = true
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+-- vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', '<C-c>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
@@ -202,6 +203,7 @@ vim.keymap.set('n', '<leader>df', vim.diagnostic.setloclist, { desc = 'Open [D]i
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<C-c><C-c>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -439,10 +441,11 @@ require('lazy').setup({
           },
           mappings = {
             i = {
-              ['<Esc>'] = require('telescope.actions').close,
+              -- ['<Esc>'] = require('telescope.actions').close,
+              ['<C-c>'] = require('telescope.actions').close,
               ['<C-j>'] = require('telescope.actions').move_selection_next,
               ['<C-k>'] = require('telescope.actions').move_selection_previous,
-              ['<C-c>'] = require('telescope.actions').delete_buffer,
+              ['<C-S-C>'] = require('telescope.actions').delete_buffer,
             },
           },
         },

@@ -14,6 +14,11 @@ end)
 vim.api.nvim_set_keymap('v', '<C-S-j>', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-S-k>', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 
+-- disabling <Esc> in insert mode
+vim.keymap.set('i', '<Esc>', '<Nop>')
+vim.keymap.set('i', 'jj', '<Esc>')
+vim.keymap.set('i', '<c-c>', '<Esc>')
+
 -- dealing with buffers
 vim.keymap.set('n', '<leader>q', function()
   local buffers = vim.api.nvim_list_bufs()
@@ -45,6 +50,7 @@ vim.keymap.set('n', '<leader>q', function()
   end
   vim.cmd 'q'
 end, { desc = '[Q]uit' })
+
 vim.keymap.set('n', '<leader>bd', function()
   if vim.bo.modified then
     vim.notify('Buffer is modified, use :w to save or :bd! to force close!', 'warn', {
