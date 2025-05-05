@@ -19,7 +19,7 @@ return {
       }
     end,
   },
-  require('custom.plugins.noice'),
+  require 'custom.plugins.noice',
   {
     'github/copilot.vim',
   },
@@ -103,4 +103,5 @@ return {
       }
     end,
   },
+  require 'custom.plugins.harpoon',
 }
