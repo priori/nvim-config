@@ -445,6 +445,18 @@ require('lazy').setup({
               ['<C-c>'] = require('telescope.actions').close,
               ['<C-j>'] = require('telescope.actions').move_selection_next,
               ['<C-k>'] = require('telescope.actions').move_selection_previous,
+              ['<C-h>'] = function()
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Left>', true, false, true), 'n', false)
+              end,
+              ['<C-l>'] = function()
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Right>', true, false, true), 'n', false)
+              end,
+              ['<C-g>'] = function()
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<BS>', true, false, true), 'n', false)
+              end,
+              ['<C-;>'] = function()
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Delete>', true, false, true), 'n', false)
+              end,
               ['<C-S-C>'] = require('telescope.actions').delete_buffer,
             },
           },
