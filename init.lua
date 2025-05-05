@@ -488,7 +488,22 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<c-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<Tab>', function()
-        require('telescope.builtin').buffers { sort_lastused = 1 }
+        require('telescope.builtin').buffers {
+          sort_lastused = 1,
+          entry_maker = function(entry)
+            local bufname = vim.api.nvim_buf_get_name(entry.bufnr)
+            local modified = vim.api.nvim_buf_get_option(entry.bufnr, 'modified')
+            local icon = modified and ' ● ' or '   '
+            return {
+              value = entry,
+              ordinal = bufname,
+              display = icon .. bufname,
+              bufnr = entry.bufnr,
+              filename = bufname,
+              display_highlight = { { { 1, 4 }, 'WarningMsg' } },
+            }
+          end,
+        }
       end, { desc = 'Buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
@@ -1133,6 +1148,8 @@ require('lazy').setup({
     },
   },
 })
+
+vim.cmd 'language en_US'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

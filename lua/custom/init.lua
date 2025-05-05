@@ -60,3 +60,5 @@ vim.api.nvim_create_autocmd('RecordingLeave', {
     end
   end,
 })
+
+require 'custom.modifiedindicador'
