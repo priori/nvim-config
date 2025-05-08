@@ -12,17 +12,26 @@ return {
     }
     harpoon:extend {
       UI_CREATE = function(cx)
-        vim.keymap.set('n', '<Esc>', function()
+        vim.keymap.set({ 'n', 'v' }, '<Esc>', function()
           -- nop
         end, { buffer = cx.bufnr })
-        vim.keymap.set('n', '<C-c>', function()
+        vim.keymap.set({ 'n', 'v' }, '<C-c>', function()
           harpoon.ui:toggle_quick_menu(harpoon:list())
         end, { buffer = cx.bufnr })
       end,
     }
 
     vim.keymap.set('n', '<leader>a', function()
-      harpoon:list():add()
+      local list = harpoon:list()
+      list:add()
+      vim.defer_fn(function()
+        local lines = {}
+        for i, item in ipairs(list.items) do
+          table.insert(lines, i .. '. ' .. item.value)
+        end
+        local message = table.concat(lines, '\n')
+        require('noice').notify(message, 'info', { title = '󰈙 Harpoon' })
+      end, 10)
     end)
 
     vim.keymap.set('n', '<C-g>', function()
@@ -44,10 +53,10 @@ return {
 
     -- Toggle previous & next buffers stored within Harpoon list
     vim.keymap.set('n', '<Tab>', function()
-      harpoon:list():prev()
+      harpoon:list():next()
     end)
     vim.keymap.set('n', '<S-Tab>', function()
-      harpoon:list():next()
+      harpoon:list():prev()
     end)
   end,
 }
