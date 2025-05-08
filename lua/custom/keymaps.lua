@@ -81,7 +81,7 @@ vim.keymap.set('n', '<leader>bd', function()
   vim.cmd 'bd'
 end, { desc = '[D]elete [B]uffer' })
 
-vim.keymap.set({ 'n', 'i' }, '<c-s>', function()
+vim.keymap.set({ 'n', 'v' }, '<c-s>', function()
   vim.cmd 'w'
 end)
 
