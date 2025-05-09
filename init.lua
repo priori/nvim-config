@@ -1077,21 +1077,17 @@ require('lazy').setup({
         use_icons = vim.g.have_nerd_font,
         content = {
           active = function()
-            -- statusline.get_config().use_icons
             local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
             local git = statusline.section_git { trunc_width = 40 }
             local diff = statusline.section_diff { trunc_width = 75 }
             local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
             local lsp = statusline.section_lsp { trunc_width = 75 }
             local filename = statusline.section_filename { trunc_width = 140 }
-            if filename:sub(-2) == '[+]' then
-              filename = filename:sub(1, -3)
-            end
+            filename = filename:gsub('%%m', '')
             local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
             local location = statusline.section_location { trunc_width = 75 }
             local search = statusline.section_searchcount { trunc_width = 75 }
             local modified = vim.bo.modified and '● Modified!' or ''
-
             -- Usage of `statusline.combine_groups()` ensures highlighting and
             -- correct padding with spaces between groups (accounts for 'missing'
             -- sections, etc.)
@@ -1108,8 +1104,11 @@ require('lazy').setup({
           end,
           inactive = function()
             local modified = vim.bo.modified and '● Modified!' or ''
+            local filename = statusline.section_filename { trunc_width = 140 }
+            filename = filename:gsub('%%m', '')
             return statusline.combine_groups {
-              '%#MiniStatuslineInactive#%F',
+              '%<',
+              { hl = 'MiniStatuslineInactive', strings = { filename } },
               { hl = 'WarningMsg', strings = { modified } },
               '%=',
             }
