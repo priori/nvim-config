@@ -34,7 +34,7 @@ vim.keymap.set('n', '<C-b>', '<C-b>zz')
 vim.keymap.set('n', '<C-f>', '<C-f>zz')
 
 -- dealing with buffers
-vim.keymap.set('n', '<leader>q', function()
+function quit()
   local buffers = vim.api.nvim_list_bufs()
   local unsaved_buffers = ''
   local terminal_buffers = ''
@@ -62,8 +62,10 @@ vim.keymap.set('n', '<leader>q', function()
     })
     return
   end
-  vim.cmd 'q'
-end, { desc = '[Q]uit' })
+  vim.cmd ':x'
+end
+vim.keymap.set('n', '<leader>q', quit, { desc = '[Q]uit' })
+vim.keymap.set('n', 'ZZ', quit, { desc = '[Q]uit' })
 
 vim.keymap.set('n', '<leader>bd', function()
   if vim.bo.modified then
