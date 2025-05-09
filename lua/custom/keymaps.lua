@@ -100,3 +100,63 @@ vim.keymap.set('n', '<leader>wq', function()
   vim.cmd 'w'
   vim.cmd 'q'
 end, { desc = 'Save ([W]rite) & [Q]uit' })
+
+-- window management - copying
+vim.keymap.set({ 'n', 'v' }, '<leader>wl', function()
+  local current_window = vim.api.nvim_get_current_win()
+  local cursor_position = vim.api.nvim_win_get_cursor(current_window)
+  local current_buffer = vim.api.nvim_get_current_buf()
+  vim.cmd 'wincmd l'
+  local new_window = vim.api.nvim_get_current_win()
+  if current_window == new_window then
+    vim.cmd 'vsplit'
+  else
+    vim.api.nvim_set_current_buf(current_buffer)
+  end
+  vim.api.nvim_win_set_cursor(new_window, cursor_position)
+end, { desc = 'Copy window to Right' })
+
+vim.keymap.set({ 'n', 'v' }, '<leader>wh', function()
+  local current_window = vim.api.nvim_get_current_win()
+  local cursor_position = vim.api.nvim_win_get_cursor(current_window)
+  local current_buffer = vim.api.nvim_get_current_buf()
+  vim.cmd 'wincmd h'
+  local new_window = vim.api.nvim_get_current_win()
+  if current_window == new_window then
+    vim.cmd 'vsplit'
+    vim.api.nvim_set_current_win(current_window)
+  else
+    vim.api.nvim_set_current_buf(current_buffer)
+  end
+  vim.api.nvim_win_set_cursor(new_window, cursor_position)
+end, { desc = 'Copy window to Left' })
+
+vim.keymap.set({ 'n', 'v' }, '<leader>wk', function()
+  local current_window = vim.api.nvim_get_current_win()
+  local cursor_position = vim.api.nvim_win_get_cursor(current_window)
+  local current_buffer = vim.api.nvim_get_current_buf()
+  vim.cmd 'wincmd k'
+  local new_window = vim.api.nvim_get_current_win()
+  if current_window == new_window then
+    vim.cmd 'split'
+    vim.api.nvim_set_current_win(current_window)
+  else
+    vim.api.nvim_set_current_buf(current_buffer)
+  end
+  vim.api.nvim_win_set_cursor(new_window, cursor_position)
+end, { desc = 'Copy window to Up' })
+
+vim.keymap.set({ 'n', 'v' }, '<leader>wj', function()
+  local current_window = vim.api.nvim_get_current_win()
+  local cursor_position = vim.api.nvim_win_get_cursor(current_window)
+  local current_buffer = vim.api.nvim_get_current_buf()
+  vim.cmd 'wincmd j'
+  local new_window = vim.api.nvim_get_current_win()
+  if current_window == new_window then
+    vim.cmd 'split'
+    vim.api.nvim_set_current_win(current_window)
+  else
+    vim.api.nvim_set_current_buf(current_buffer)
+  end
+  vim.api.nvim_win_set_cursor(new_window, cursor_position)
+end, { desc = 'Copy window to Down' })
