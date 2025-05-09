@@ -32,7 +32,7 @@ return {
         local message = table.concat(lines, '\n')
         require('noice').notify(message, 'info', { title = '󰈙 Harpoon' })
       end, 10)
-    end)
+    end, { desc = 'Add file to Harpoon' })
 
     vim.keymap.set('n', '<C-g>', function()
       harpoon.ui:toggle_quick_menu(harpoon:list())
