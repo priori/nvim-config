@@ -65,10 +65,10 @@ local function update_indicator_for_win(win)
   end
 
   if vim.bo[buf].modified then
-    show_indicator(win, ' ● Modified!', 'WarningMsg')
+    show_indicator(win, ' ● Modified! ', 'WarningMsg')
   else
     local current = win_indicators[win]
-    if current and current.text ~= ' Saved ✓' then
+    if current and current.text ~= ' Saved ✓ ' then
       if vim.api.nvim_win_is_valid(current.float_win) then
         vim.api.nvim_win_close(current.float_win, true)
       end
@@ -112,14 +112,14 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter', 'TextChanged', 'TextCha
   end,
 })
 
--- Indicador de "Saved ✓"
+-- Indicador de " Saved ✓ "
 vim.api.nvim_create_autocmd('BufWritePost', {
   callback = function(args)
     local buf = args.buf
     for _, win in ipairs(vim.api.nvim_list_wins()) do
       if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
         if vim.bo[buf].buftype == '' then
-          show_indicator(win, ' Saved ✓', 'DiffAdded', 2000)
+          show_indicator(win, ' Saved ✓ ', 'DiffAdded', 2000)
         end
       end
     end
@@ -137,4 +137,3 @@ vim.api.nvim_create_autocmd('WinClosed', {
     win_indicators[win_id] = nil
   end,
 })
-
