@@ -457,7 +457,11 @@ require('lazy').setup({
               ['<C-;>'] = function()
                 vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Delete>', true, false, true), 'n', false)
               end,
-              ['<C-S-C>'] = require('telescope.actions').delete_buffer,
+            },
+            n = {
+              ['d'] = require('telescope.actions').delete_buffer,
+              ['q'] = require('telescope.actions').close,
+              ['<c-C>'] = require('telescope.actions').close,
             },
           },
         },
@@ -499,9 +503,10 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<c-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader><Tab>', function()
+      vim.keymap.set('n', '<Tab>', function()
         require('telescope.builtin').buffers {
           sort_lastused = 1,
+          initial_mode = 'normal',
           entry_maker = function(entry)
             local bufname = vim.api.nvim_buf_get_name(entry.bufnr)
             local modified = vim.api.nvim_buf_get_option(entry.bufnr, 'modified')
