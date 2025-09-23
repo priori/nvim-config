@@ -6,6 +6,9 @@ vim.keymap.set({ 'i', 't', 'c' }, '<C-k>', '<up>')
 vim.keymap.set({ 'i', 't', 'c' }, '<C-S-h>', '<S-Left>')
 vim.keymap.set({ 'i', 't', 'c' }, '<C-S-l>', '<S-Right>')
 
+vim.keymap.set('v', '<Leader>p', '"_dP', { desc = 'Paste without replacing register' })
+vim.keymap.set('v', '<Leader>d', '"_d', { desc = 'Delete without replacing register' })
+
 -- deleting
 vim.keymap.set({ 'i', 'c', 't' }, '<C-g>', '<BackSpace>')
 vim.keymap.set({ 'i', 'c', 't' }, '<C-;>', '<Delete>')
