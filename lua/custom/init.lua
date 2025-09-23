@@ -20,3 +20,10 @@ vim.api.nvim_create_autocmd('RecordingLeave', {
 })
 
 require 'custom.modifiedindicador'
+
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 2
+vim.opt.smarttab = true
+vim.opt.autoindent = true
