@@ -1,17 +1,24 @@
-local in_cmdline = false
+local indicators = {}
 
-vim.api.nvim_create_autocmd('CmdlineEnter', {
-  callback = function()
-    in_cmdline = true
-  end,
-})
+local function close_indicator(win)
+  local entry = indicators[win]
+  if not entry then
+    return
+  end
 
-local win_indicators = {}
+  if entry.float and vim.api.nvim_win_is_valid(entry.float) then
+    vim.api.nvim_win_close(entry.float, true)
+  end
+
+  if entry.buf and vim.api.nvim_buf_is_valid(entry.buf) then
+    pcall(vim.api.nvim_buf_delete, entry.buf, { force = true })
+  end
+
+  indicators[win] = nil
+end
 
 local function show_indicator(win, text, hl, duration)
-  if win_indicators[win] and vim.api.nvim_win_is_valid(win_indicators[win].float_win) then
-    vim.api.nvim_win_close(win_indicators[win].float_win, true)
-  end
+  close_indicator(win) -- re-create to keep position in sync with window size
 
   if not vim.api.nvim_win_is_valid(win) then
     return
@@ -21,7 +28,7 @@ local function show_indicator(win, text, hl, duration)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, { text })
 
   local width = vim.fn.strdisplaywidth(text)
-  local opts = {
+  local float = vim.api.nvim_open_win(buf, false, {
     relative = 'win',
     win = win,
     anchor = 'NE',
@@ -32,108 +39,98 @@ local function show_indicator(win, text, hl, duration)
     focusable = false,
     style = 'minimal',
     noautocmd = true,
-  }
+  })
 
-  local float_win = vim.api.nvim_open_win(buf, false, opts)
-  vim.api.nvim_win_set_option(float_win, 'winhl', 'Normal:' .. hl)
+  vim.api.nvim_win_set_option(float, 'winhl', 'Normal:' .. hl)
 
-  win_indicators[win] = {
-    float_win = float_win,
+  indicators[win] = {
+    float = float,
     buf = buf,
     text = text,
-    hl = hl,
   }
 
   if duration then
     vim.defer_fn(function()
-      if vim.api.nvim_win_is_valid(float_win) then
-        vim.api.nvim_win_close(float_win, true)
-      end
-      win_indicators[win] = nil
+      close_indicator(win)
     end, duration)
   end
 end
 
-local function update_indicator_for_win(win)
+local function should_ignore(buf)
+  return vim.bo[buf].buftype ~= '' or not vim.api.nvim_buf_is_loaded(buf)
+end
+
+local function update_window(win)
   if not vim.api.nvim_win_is_valid(win) then
     return
   end
 
   local buf = vim.api.nvim_win_get_buf(win)
-  if vim.bo[buf].buftype ~= '' then
+  if should_ignore(buf) then
+    close_indicator(win)
     return
   end
 
   if vim.bo[buf].modified then
     show_indicator(win, ' ● Modified! ', 'WarningMsg')
-  else
-    local current = win_indicators[win]
-    if current and current.text ~= ' Saved ✓ ' then
-      if vim.api.nvim_win_is_valid(current.float_win) then
-        vim.api.nvim_win_close(current.float_win, true)
-      end
-      win_indicators[win] = nil
-    end
-  end
-end
-
-local function update_all_windows()
-  if in_cmdline then
     return
   end
 
-  local active_wins = {}
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    active_wins[win] = true
-    update_indicator_for_win(win)
+  -- Keep "Saved" message alive until its timer closes it
+  local current = indicators[win]
+  if current and current.text == ' Saved ✓ ' then
+    return
   end
 
-  for win, data in pairs(win_indicators) do
-    if not active_wins[win] then
-      if data.float_win and vim.api.nvim_win_is_valid(data.float_win) then
-        vim.api.nvim_win_close(data.float_win, true)
-      end
-      win_indicators[win] = nil
+  close_indicator(win)
+end
+
+local function update_windows_for_buf(buf)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
+      update_window(win)
     end
   end
 end
 
-vim.api.nvim_create_autocmd('CmdlineLeave', {
-  callback = function()
-    in_cmdline = false
-    vim.defer_fn(update_all_windows, 10)
+-- Atualiza de forma reativa sempre que o estado "modified" mudar
+vim.api.nvim_create_autocmd('BufModifiedSet', {
+  callback = function(args)
+    update_windows_for_buf(args.buf)
   end,
 })
 
--- Autocomandos para atualizar indicador ao modificar, entrar, redimensionar etc.
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter', 'TextChanged', 'TextChangedI', 'WinEnter', 'WinResized' }, {
-  callback = function()
-    vim.defer_fn(update_all_windows, 10)
+-- Garante atualização ao entrar/trocar de janela ou redimensionar
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter', 'WinEnter', 'WinResized' }, {
+  callback = function(args)
+    local win = args.win or vim.api.nvim_get_current_win()
+    vim.defer_fn(function()
+      update_window(win)
+    end, 5)
   end,
 })
 
--- Indicador de " Saved ✓ "
+-- Indicador de "Saved" após salvar
 vim.api.nvim_create_autocmd('BufWritePost', {
   callback = function(args)
     local buf = args.buf
     for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
-        if vim.bo[buf].buftype == '' then
-          show_indicator(win, ' Saved ✓ ', 'DiffAdded', 2000)
-        end
+      if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf and not should_ignore(buf) then
+        show_indicator(win, ' Saved ✓ ', 'DiffAdded', 1800)
       end
     end
+
+    -- Depois de exibir o "Saved", revalida o estado para remover se necessário
+    vim.defer_fn(function()
+      update_windows_for_buf(buf)
+    end, 1850)
   end,
 })
 
--- Autocmd extra para limpar quando janela for fechada
+-- Limpa indicadores quando a janela fecha
 vim.api.nvim_create_autocmd('WinClosed', {
   callback = function(args)
-    local win_id = tonumber(args.match)
-    local entry = win_indicators[win_id]
-    if entry and entry.float_win and vim.api.nvim_win_is_valid(entry.float_win) then
-      vim.api.nvim_win_close(entry.float_win, true)
-    end
-    win_indicators[win_id] = nil
+    local win = tonumber(args.match)
+    close_indicator(win)
   end,
 })
