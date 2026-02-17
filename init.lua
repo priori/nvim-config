@@ -119,9 +119,7 @@ vim.o.showmode = false
 -- end)
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
-    if vim.v.event.operator == 'y' then
-      vim.fn.setreg('+', vim.fn.getreg '"')
-    end
+    if vim.v.event.operator == 'y' then vim.fn.setreg('+', vim.fn.getreg '"') end
   end,
 })
 
@@ -464,18 +462,10 @@ require('lazy').setup({
               ['<C-c>'] = require('telescope.actions').close,
               ['<C-j>'] = require('telescope.actions').move_selection_next,
               ['<C-k>'] = require('telescope.actions').move_selection_previous,
-              ['<C-h>'] = function()
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Left>', true, false, true), 'n', false)
-              end,
-              ['<C-l>'] = function()
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Right>', true, false, true), 'n', false)
-              end,
-              ['<C-g>'] = function()
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<BS>', true, false, true), 'n', false)
-              end,
-              ['<C-;>'] = function()
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Delete>', true, false, true), 'n', false)
-              end,
+              ['<C-h>'] = function() vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Left>', true, false, true), 'n', false) end,
+              ['<C-l>'] = function() vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Right>', true, false, true), 'n', false) end,
+              ['<C-g>'] = function() vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<BS>', true, false, true), 'n', false) end,
+              ['<C-;>'] = function() vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Delete>', true, false, true), 'n', false) end,
             },
             n = {
               ['d'] = require('telescope.actions').delete_buffer,
@@ -1124,7 +1114,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     config = function()
       local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(filetypes)
+      -- require('nvim-treesitter').install(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
         callback = function() vim.treesitter.start() end,
