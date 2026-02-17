@@ -219,6 +219,7 @@ In `noice` buffer:
 From [init.lua](init.lua) and [lua/custom/init.lua](lua/custom/init.lua):
 
 - Line numbers: absolute + relative
+- No swap files
 - Mouse: enabled (`a`)
 - Do not show mode (statusline already handles it)
 - Clipboard sync: yank operations copy to system clipboard via a `TextYankPost` autocmd
