@@ -276,6 +276,7 @@ Custom:
 
 - `typescript-tools.nvim`
 - `noice.nvim` (+ `nui.nvim`, `nvim-notify`)
+- `vim-fugitive`
 - `github/copilot.vim`
 - `flash.nvim`
 - `nvim-ts-autotag`
