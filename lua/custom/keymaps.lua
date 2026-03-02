@@ -14,12 +14,8 @@ vim.keymap.set({ 'i', 'c', 't' }, '<C-g>', '<BackSpace>')
 vim.keymap.set({ 'i', 'c', 't' }, '<C-;>', '<Delete>')
 
 -- moving lines
-vim.keymap.set('n', '<C-S-j>', function()
-  vim.cmd 'm+1'
-end)
-vim.keymap.set('n', '<C-S-k>', function()
-  vim.cmd 'm-2'
-end)
+vim.keymap.set('n', '<C-S-j>', function() vim.cmd 'm+1' end)
+vim.keymap.set('n', '<C-S-k>', function() vim.cmd 'm-2' end)
 vim.api.nvim_set_keymap('v', '<C-S-j>', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-S-k>', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', 'J', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
