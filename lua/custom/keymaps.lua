@@ -25,6 +25,8 @@ vim.api.nvim_set_keymap('v', 'K', ":m '<-2<CR>gv=gv", { noremap = true, silent =
 vim.keymap.set('i', '<Esc>', '<Nop>')
 vim.keymap.set('i', 'jj', '<Esc>')
 vim.keymap.set('i', '<c-c>', '<Esc>')
+vim.keymap.set('i', 'jk', '<Esc>')
+vim.keymap.set('i', '<c-]>', '<Esc>')
 
 -- scrolling
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
