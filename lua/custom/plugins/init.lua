@@ -28,9 +28,7 @@ return {
     'windwp/nvim-ts-autotag',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
     event = 'InsertEnter',
-    config = function()
-      require('nvim-ts-autotag').setup()
-    end,
+    config = function() require('nvim-ts-autotag').setup() end,
   },
   {
     'nvim-treesitter/nvim-treesitter-context',
