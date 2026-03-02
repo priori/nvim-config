@@ -15,9 +15,7 @@ return {
         vim.keymap.set({ 'n', 'v' }, '<Esc>', function()
           -- nop
         end, { buffer = cx.bufnr })
-        vim.keymap.set({ 'n', 'v' }, '<C-c>', function()
-          harpoon.ui:toggle_quick_menu(harpoon:list())
-        end, { buffer = cx.bufnr })
+        vim.keymap.set({ 'n', 'v' }, '<C-c>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { buffer = cx.bufnr })
       end,
     }
 
@@ -34,35 +32,17 @@ return {
       end, 10)
     end, { desc = 'Add file to Harpoon' })
 
-    vim.keymap.set('n', '<C-g>', function()
-      harpoon.ui:toggle_quick_menu(harpoon:list())
-    end)
+    vim.keymap.set('n', '<C-g>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
-    vim.keymap.set('n', '<leader>1', function()
-      harpoon:list():select(1)
-    end)
-    vim.keymap.set('n', '<leader>2', function()
-      harpoon:list():select(2)
-    end)
-    vim.keymap.set('n', '<leader>3', function()
-      harpoon:list():select(3)
-    end)
-    vim.keymap.set('n', '<leader>4', function()
-      harpoon:list():select(4)
-    end)
-    vim.keymap.set('n', '<leader>5', function()
-      harpoon:list():select(5)
-    end)
-    vim.keymap.set('n', '<leader>6', function()
-      harpoon:list():select(6)
-    end)
+    vim.keymap.set('n', '<leader>1', function() harpoon:list():select(1) end)
+    vim.keymap.set('n', '<leader>2', function() harpoon:list():select(2) end)
+    vim.keymap.set('n', '<leader>3', function() harpoon:list():select(3) end)
+    vim.keymap.set('n', '<leader>4', function() harpoon:list():select(4) end)
+    vim.keymap.set('n', '<leader>5', function() harpoon:list():select(5) end)
+    vim.keymap.set('n', '<leader>6', function() harpoon:list():select(6) end)
 
     -- Toggle previous & next buffers stored within Harpoon list
-    vim.keymap.set('n', '<leader><Tab>', function()
-      harpoon:list():next()
-    end)
-    vim.keymap.set('n', '<leader><S-Tab>', function()
-      harpoon:list():prev()
-    end)
+    vim.keymap.set('n', '<leader><Tab>', function() harpoon:list():next { ui_nav_wrap = true } end)
+    vim.keymap.set('n', '<leader><S-Tab>', function() harpoon:list():prev { ui_nav_wrap = true } end)
   end,
 }
