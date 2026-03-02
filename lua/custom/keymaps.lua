@@ -47,9 +47,7 @@ function quit()
         unsaved_buffers = unsaved_buffers .. '\n- ' .. vim.fn.bufname(buf)
       end
     end
-    if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then
-      terminal_buffers = terminal_buffers .. '\n- ' .. vim.fn.bufname(buf)
-    end
+    if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then terminal_buffers = terminal_buffers .. '\n- ' .. vim.fn.bufname(buf) end
   end
   if unsaved_buffers ~= '' then
     vim.notify('Buffer is modified, use :w to save or :bd! to force close!' .. unsaved_buffers, 'warn', {
@@ -84,13 +82,9 @@ vim.keymap.set('n', '<leader>bd', function()
   vim.cmd 'bd'
 end, { desc = '[D]elete [B]uffer' })
 
-vim.keymap.set({ 'n', 'v' }, '<c-s>', function()
-  vim.cmd 'w'
-end)
+vim.keymap.set({ 'n', 'v' }, '<c-s>', function() vim.cmd 'w' end)
 
-vim.keymap.set('n', '<leader>ww', function()
-  vim.cmd 'w'
-end, { desc = 'Save ([W]rite)' })
+vim.keymap.set('n', '<leader>ww', function() vim.cmd 'w' end, { desc = 'Save ([W]rite)' })
 
 vim.keymap.set('n', '<leader>wd', function()
   vim.cmd 'w'
