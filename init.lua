@@ -428,6 +428,42 @@ require('lazy').setup({
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
+      local actions = require 'telescope.actions'
+      local action_state = require 'telescope.actions.state'
+
+      local function delete_buffer_and_move_down(prompt_bufnr)
+        local picker = action_state.get_current_picker(prompt_bufnr)
+        if not picker or not picker.manager then return end
+
+        local selected_row = picker:get_selection_row()
+        local below_index = picker:get_index(selected_row + 1)
+        local below_entry = below_index and picker.manager:get_entry(below_index) or nil
+        local target_bufnr = below_entry and below_entry.bufnr or nil
+
+        actions.delete_buffer(prompt_bufnr)
+
+        vim.schedule(function()
+          local current_picker = action_state.get_current_picker(prompt_bufnr)
+          if not current_picker or not current_picker.manager then return end
+
+          local remaining_results = current_picker.manager:num_results()
+          if remaining_results == 0 then return end
+
+          if target_bufnr then
+            for i = 1, remaining_results do
+              local entry = current_picker.manager:get_entry(i)
+              if entry and entry.bufnr == target_bufnr then
+                current_picker:set_selection(current_picker:get_row(i))
+                return
+              end
+            end
+          end
+
+          local target_row = math.min(selected_row, remaining_results - 1)
+          current_picker:set_selection(target_row)
+        end)
+      end
+
       -- Telescope is a fuzzy finder that comes with a lot of different things that
       -- it can fuzzy find! It's more than just a "file finder", it can search
       -- many different aspects of Neovim, your workspace, LSP, and more!
@@ -484,6 +520,38 @@ require('lazy').setup({
           },
         },
         pickers = {
+          buffers = {
+            sort_lastused = 1,
+            initial_mode = 'normal',
+            attach_mappings = function(prompt_bufnr, map)
+              map('n', 't', actions.toggle_selection)
+              map('n', 'd', delete_buffer_and_move_down)
+
+              vim.schedule(function()
+                if not vim.api.nvim_buf_is_valid(prompt_bufnr) then return end
+
+                local opts = { buffer = prompt_bufnr, noremap = true, silent = true, nowait = true }
+                vim.keymap.set('n', '<Tab>', function() actions.move_selection_previous(prompt_bufnr) end, opts)
+                vim.keymap.set('n', '<C-i>', function() actions.move_selection_previous(prompt_bufnr) end, opts)
+                vim.keymap.set('n', '<S-Tab>', function() actions.move_selection_next(prompt_bufnr) end, opts)
+              end)
+
+              return true
+            end,
+            entry_maker = function(entry)
+              local bufname = vim.api.nvim_buf_get_name(entry.bufnr)
+              local modified = vim.api.nvim_buf_get_option(entry.bufnr, 'modified')
+              local icon = modified and ' ● ' or '   '
+              return {
+                value = entry,
+                ordinal = bufname,
+                display = icon .. bufname,
+                bufnr = entry.bufnr,
+                filename = bufname,
+                display_highlight = { { { 1, 4 }, 'WarningMsg' } },
+              }
+            end,
+          },
           lsp_definitions = {
             file_ignore_patterns = {
               'release',
@@ -521,25 +589,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<c-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<Tab>', function()
-        require('telescope.builtin').buffers {
-          sort_lastused = 1,
-          initial_mode = 'normal',
-          entry_maker = function(entry)
-            local bufname = vim.api.nvim_buf_get_name(entry.bufnr)
-            local modified = vim.api.nvim_buf_get_option(entry.bufnr, 'modified')
-            local icon = modified and ' ● ' or '   '
-            return {
-              value = entry,
-              ordinal = bufname,
-              display = icon .. bufname,
-              bufnr = entry.bufnr,
-              filename = bufname,
-              display_highlight = { { { 1, 4 }, 'WarningMsg' } },
-            }
-          end,
-        }
-      end, { desc = 'Buffers' })
+      vim.keymap.set('n', '<Tab>', builtin.buffers, { desc = 'Buffers' })
       vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
 
       -- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
