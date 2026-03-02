@@ -318,6 +318,7 @@ External Requirements:
 - Basic utils: `git`, `make`, `unzip`, C Compiler (`gcc`)
 - [ripgrep](https://github.com/BurntSushi/ripgrep#installation),
   [fd-find](https://github.com/sharkdp/fd#installation)
+- [tree-sitter CLI](https://github.com/tree-sitter/tree-sitter/blob/master/crates/cli/README.md#installation)
 - Clipboard tool (xclip/xsel/win32yank or other depending on the platform)
 - A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons
   - if you have it set `vim.g.have_nerd_font` in `init.lua` to true
@@ -479,7 +480,7 @@ winget install --accept-source-agreements chocolatey.chocolatey
    open a new one so that choco path is set, and run in cmd as **admin**:
 
 ```
-choco install -y neovim git ripgrep wget fd unzip gzip mingw make
+choco install -y neovim git ripgrep wget fd unzip gzip mingw make tree-sitter
 ```
 
 </details>
@@ -490,7 +491,7 @@ wsl --install
 wsl
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update
-sudo apt install make gcc ripgrep unzip git xclip neovim
+sudo apt install make gcc ripgrep fd-find tree-sitter-cli unzip git xclip neovim
 ```
 
 </details>
@@ -502,7 +503,7 @@ sudo apt install make gcc ripgrep unzip git xclip neovim
 ```
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update
-sudo apt install make gcc ripgrep unzip git xclip neovim
+sudo apt install make gcc ripgrep fd-find tree-sitter-cli unzip git xclip neovim
 ```
 
 </details>
@@ -510,7 +511,7 @@ sudo apt install make gcc ripgrep unzip git xclip neovim
 
 ```
 sudo apt update
-sudo apt install make gcc ripgrep unzip git xclip curl
+sudo apt install make gcc ripgrep fd-find tree-sitter-cli unzip git xclip curl
 
 # Now we install nvim
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
@@ -527,7 +528,7 @@ sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/
 <details><summary>Fedora Install Steps</summary>
 
 ```
-sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
+sudo dnf install -y gcc make git ripgrep fd-find tree-sitter-cli unzip neovim
 ```
 
 </details>
@@ -535,7 +536,7 @@ sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 <details><summary>Arch Install Steps</summary>
 
 ```
-sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
+sudo pacman -S --noconfirm --needed gcc make git ripgrep fd tree-sitter-cli unzip neovim
 ```
 
 </details>
