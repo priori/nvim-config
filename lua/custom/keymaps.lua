@@ -33,6 +33,7 @@ vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-b>', '<C-b>zz')
 vim.keymap.set('n', '<C-f>', '<C-f>zz')
+vim.keymap.set('n', '<leader>o', '<C-i>', { desc = 'Jump forward in jumplist' })
 
 -- dealing with buffers
 function quit()

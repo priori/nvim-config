@@ -532,7 +532,6 @@ require('lazy').setup({
 
                 local opts = { buffer = prompt_bufnr, noremap = true, silent = true, nowait = true }
                 vim.keymap.set('n', '<Tab>', function() actions.move_selection_previous(prompt_bufnr) end, opts)
-                vim.keymap.set('n', '<C-i>', function() actions.move_selection_previous(prompt_bufnr) end, opts)
                 vim.keymap.set('n', '<S-Tab>', function() actions.move_selection_next(prompt_bufnr) end, opts)
               end)
 
