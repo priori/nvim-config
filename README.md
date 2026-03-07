@@ -14,6 +14,9 @@ Normal mode:
 - `<leader>ww`: write (save)
 - `<leader>wd`: write + delete buffer
 - `<leader>wq`: write + quit
+- `<C-o>` / `<leader>o`: jump backward/forward in jumplist (`<leader>o` remaps the original `<C-i>`)
+- `<C-6>`: switch to alternate buffer (last file)
+- `g;` / `g,`: jump backward/forward in changelist
 - `<C-u>`, `<C-d>`, `<C-b>`, `<C-f>`: scroll and keep cursor centered
 - `<C-S-j>` / `<C-S-k>`: move current line down/up
 - `<leader>ww`: write buffer
