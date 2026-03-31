@@ -28,6 +28,14 @@ vim.keymap.set('i', '<c-c>', '<Esc>')
 vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('i', '<c-]>', '<Esc>')
 
+local modes = { 'n', 'i', 'v', 'x', 's', 'o', 't' }
+local arrows = { '<Up>', '<Down>', '<Left>', '<Right>' }
+for _, mode in ipairs(modes) do
+  for _, arrow in ipairs(arrows) do
+    vim.keymap.set(mode, arrow, '<Nop>')
+  end
+end
+
 -- scrolling
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
